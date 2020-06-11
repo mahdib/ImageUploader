@@ -24,6 +24,7 @@ namespace ImageUploader
             services.Configure<Helpers.ImageSettings>(Configuration.GetSection("ImageSettings"));
             services.Configure<Helpers.FtpServerSettings>(Configuration.GetSection("FtpServerSettings"));
             services.Configure<Helpers.FoldersSettings>(Configuration.GetSection("FoldersSettings"));
+            services.Configure<Helpers.ApiSettings>(Configuration.GetSection("ApiSettings"));
             services.AddRazorPages();
             services.AddControllers();
             services.AddHttpClient();
@@ -45,7 +46,11 @@ namespace ImageUploader
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+            });
         }
     }
 }
