@@ -23,7 +23,10 @@ namespace ImageUploader
             services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlite(Configuration.GetConnectionString("Default")));
             services.Configure<Helpers.ImageSettings>(Configuration.GetSection("ImageSettings"));
             services.Configure<Helpers.FtpServerSettings>(Configuration.GetSection("FtpServerSettings"));
+            services.Configure<Helpers.FoldersSettings>(Configuration.GetSection("FoldersSettings"));
+            services.AddRazorPages();
             services.AddControllers();
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
