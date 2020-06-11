@@ -18,7 +18,7 @@ namespace ImageUploader.Data
 
             entity.HasKey(p => p.Id);
 
-            entity.Property(p => p.FileName)
+            entity.Property(p => p.Title)
             .HasMaxLength(250)
             .IsUnicode()
             .IsRequired();
