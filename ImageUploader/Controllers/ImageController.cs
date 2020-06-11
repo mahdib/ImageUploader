@@ -17,6 +17,7 @@ namespace ImageUploader.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class ImageController : ControllerBase
     {
         private readonly IOptions<ImageSettings> _imageSettings;
@@ -35,7 +36,7 @@ namespace ImageUploader.Controllers
             _foldersSettings = foldersSettings;
         }
 
-        [HttpGet("{filter}")]
+        [HttpGet("{filter?}")]
         public async Task<IActionResult> GetAsync(string filter = null)
         {
             List<Photo> images;
@@ -57,7 +58,7 @@ namespace ImageUploader.Controllers
             return Ok(images);
         }
 
-        [HttpGet("{id}", Name = "GetImage")]
+        [HttpGet("{id:int}", Name = "GetImage")]
         public async Task<IActionResult> GetAsync(int id)
         {
             if (id == 0) return BadRequest();
