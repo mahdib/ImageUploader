@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using ImageUploader.Controllers.DTO;
 using ImageUploader.Data;
 using ImageUploader.Helpers;
 using ImageUploader.Models;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -40,7 +38,7 @@ namespace ImageUploader.Controllers
         [HttpGet("{filter}")]
         public async Task<IActionResult> GetAsync(string filter = null)
         {
-            List<Photo> images = null;
+            List<Photo> images;
 
             if (string.IsNullOrEmpty(filter))
             {
@@ -88,30 +86,46 @@ namespace ImageUploader.Controllers
             if (model.File is null) return BadRequest("Image file cannot be empty.");
 
             var file = model.File;
-            var folderName = _foldersSettings.Value.ImageFolderName;
-            var path = Path.Combine(_environment.WebRootPath, folderName);
 
             if (!CheckFileSize(file.Length))
                 return BadRequest($"The file is more than {_imageSettings.Value.MaxSize} byte or is less than {_imageSettings.Value.MinSize} byte.");
 
-            var fileName = Path.GetFileName(file.FileName);
-            var fullPath = Path.Combine(path, fileName);
-            var fileUrl = Path.Combine(folderName, fileName);
-
-            if (model.IsFtp) await UploadToFtpAsync(model.File, fileName).ConfigureAwait(false);
+            var entity = new Photo();
+            var extension = Path.GetExtension(file.FileName);
+            var fileName = new Guid() + extension;
 
             try
             {
-                if (!Directory.Exists(path)) Directory.CreateDirectory(folderName);
-
-                using var stream = new FileStream(fullPath, FileMode.Create);
-                await file.CopyToAsync(stream).ConfigureAwait(false);
-
-                var entity = new Photo
+                if (model.IsFtp)
                 {
-                    Title = model.Title,
-                    Url = fileUrl
-                };
+                    var uri = _ftpServerSettings.Value?.Uri;
+                    var username = _ftpServerSettings.Value?.UserName;
+                    var password = _ftpServerSettings.Value?.Password;
+
+                    var request = (FtpWebRequest)WebRequest.Create(uri + fileName);
+                    request.Credentials = new NetworkCredential(username, password);
+                    request.Method = WebRequestMethods.Ftp.UploadFile;
+
+                    using var stream = request.GetRequestStream();
+                    await file.CopyToAsync(stream).ConfigureAwait(false);
+
+                    entity.Title = model.Title;
+                    entity.Url = uri + fileName;
+                }
+                else
+                {
+                    var folderName = _foldersSettings.Value.ImageFolderName;
+                    var path = Path.Combine(_environment.WebRootPath, folderName);
+                    var fullPath = Path.Combine(path, fileName);
+                    var fileUrl = Path.Combine(folderName, fileName);
+
+                    if (!Directory.Exists(path)) Directory.CreateDirectory(folderName);
+
+                    await using var stream = new FileStream(fullPath, FileMode.Create);
+                    await file.CopyToAsync(stream).ConfigureAwait(false);
+                    entity.Title = model.Title;
+                    entity.Url = fileUrl;
+                }
 
                 await _dbContext.Photos.AddAsync(entity).ConfigureAwait(false);
 
@@ -122,35 +136,6 @@ namespace ImageUploader.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        private async Task<FtpStatusCode> UploadToFtpAsync(IFormFile file, string fileName)
-        {
-            var uri = _ftpServerSettings.Value?.Uri;
-            var username = _ftpServerSettings.Value?.UserName;
-            var password = _ftpServerSettings.Value?.Password;
-            try
-            {
-                var request = (FtpWebRequest)WebRequest.Create(uri);
-                var credential = new NetworkCredential(username, password);
-                request.Method = WebRequestMethods.Ftp.UploadFile;
-
-                var sourceStream = new StreamReader(file.FileName);
-                byte[] fileContents = Encoding.UTF8.GetBytes(await sourceStream.ReadToEndAsync().ConfigureAwait(false));
-                sourceStream.Close();
-                request.ContentLength = fileContents.Length;
-
-                var requestStream = await request.GetRequestStreamAsync().ConfigureAwait(false);
-                await requestStream.WriteAsync(fileContents, 0, fileContents.Length).ConfigureAwait(false);
-                requestStream.Close();
-
-                var response = (FtpWebResponse)await request.GetResponseAsync().ConfigureAwait(false);
-                if(response.StatusCode == FtpStatusCode.CommandOK) return response.
-            }
-            catch (Exception)
-            {
-                return FtpStatusCode.CommandSyntaxError;
             }
         }
 
