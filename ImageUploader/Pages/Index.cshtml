@@ -1,0 +1,40 @@
+﻿@page "/"
+@model ImageUploader.Pages.IndexModel
+@{
+    ViewData["Title"] = "Photo List";
+}
+
+<h3>
+    @ViewData["Title"]
+</h3>
+<a asp-page="Create" class="btn btn-primary btn-sm mb-3">Post an Image</a>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-danger" role="alert">
+        @Model.Message
+    </div>
+}
+
+@if (!Model.PhotoList.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        There is no record to show!
+    </div>
+}
+else
+{
+    foreach (var photo in Model.PhotoList)
+    {
+        <div class="col-md-4">
+            <div class="thumbnail">
+                <a href="@photo.Url">
+                    <img src="@photo.Url" alt="@photo.Title" style="width: 100%">
+                    <div class="caption">
+                        <p>@photo.Title</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    }
+}
