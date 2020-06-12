@@ -340,5 +340,18 @@ ASALocalRun/
 healthchecksdb
 
 .vscode/
-Properties/
-*Migrations/
+/Properties/
+/Data/Migrations/*
+/wwwroot/Resource/*
+*.db
+ImageUploader/ImageUploader.db-shm
+ImageUploader/ImageUploader.db-wal
+ImageUploader/Data/Migrations/20200609181925_Initailize.cs
+ImageUploader/Data/Migrations/20200611162046_ChangeFileNameToTitleInImage.cs
+ImageUploader/Data/Migrations/20200611162046_ChangeFileNameToTitleInImage.Designer.cs
+ImageUploader/Data/Migrations/20200612035653_RemoveTitleFromPhoto.cs
+ImageUploader/Data/Migrations/20200612035653_RemoveTitleFromPhoto.Designer.cs
+ImageUploader/Data/Migrations/ApplicationDbContextModelSnapshot.cs
+ImageUploader/wwwroot/Resource/26c70a42-f616-485a-8629-da57145dc2b2.jpg.jpg
+ImageUploader/Data/Migrations/20200609181925_Initailize.cs
+ImageUploader/Data/Migrations/ApplicationDbContextModelSnapshot.cs

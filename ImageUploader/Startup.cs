@@ -27,6 +27,7 @@ namespace ImageUploader
             services.Configure<Helpers.ApiSettings>(Configuration.GetSection("ApiSettings"));
             services.AddRazorPages();
             services.AddControllers();
+            services.AddRouting(opt => opt.LowercaseUrls = true);
             services.AddHttpClient();
         }
 

@@ -15,10 +15,7 @@ namespace ImageUploader.Data.Migrations
                     FileName = table.Column<string>(maxLength: 250, nullable: false),
                     Url = table.Column<string>(maxLength: 2048, nullable: false)
                 },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Images", x => x.Id);
-                });
+                constraints: table => table.PrimaryKey("PK_Images", x => x.Id));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

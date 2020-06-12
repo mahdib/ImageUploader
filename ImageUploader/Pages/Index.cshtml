@@ -1,5 +1,6 @@
 ﻿@page "/"
 @model ImageUploader.Pages.IndexModel
+
 @{
     ViewData["Title"] = "Photo List";
 }
@@ -24,17 +25,16 @@
 }
 else
 {
-    foreach (var photo in Model.PhotoList)
+    <div class="row">
+    @foreach (var photo in Model.PhotoList)
     {
-        <div class="col-md-4">
+        <div class="col-3">
             <div class="thumbnail">
                 <a href="@photo.Url">
-                    <img src="@photo.Url" alt="@photo.Title" style="width: 100%">
-                    <div class="caption">
-                        <p>@photo.Title</p>
-                    </div>
+                    <img src="@photo.Url" alt="" style="width: 100%">
                 </a>
             </div>
         </div>
     }
+    </div>
 }

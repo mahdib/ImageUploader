@@ -21,12 +21,6 @@ namespace ImageUploader.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasMaxLength(250)
-                        .IsUnicode(true);
-
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("TEXT")
